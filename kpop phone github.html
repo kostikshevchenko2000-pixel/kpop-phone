@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adam Weil · Phone</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: linear-gradient(135deg, #0a0118 0%, #1a0533 50%, #0d0226 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+}
+
+/* API KEY SETUP */
+.setup {
+  position: fixed; inset: 0;
+  background: rgba(10,1,24,0.97);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; padding: 20px;
+}
+.setup-box {
+  background: linear-gradient(160deg,#12062a,#0a0118);
+  border: 1px solid rgba(150,90,255,0.5);
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%; max-width: 320px;
+  text-align: center;
+}
+.setup-title { font-size: 18px; font-weight: 800; color: #ff7ae0; margin-bottom: 8px; }
+.setup-sub { font-size: 12px; color: rgba(180,150,255,0.6); margin-bottom: 20px; line-height: 1.5; }
+.setup-input {
+  width: 100%; background: rgba(40,15,75,0.5);
+  border: 1px solid rgba(150,90,255,0.4); border-radius: 12px;
+  padding: 10px 14px; color: #e8dcff; font-size: 12px;
+  outline: none; margin-bottom: 12px;
+}
+.setup-btn {
+  width: 100%; padding: 12px;
+  background: linear-gradient(135deg,#7a30ff,#ff5ad0);
+  border: none; border-radius: 12px;
+  color: #fff; font-size: 14px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* PHONE */
+.phone {
+  width: 340px; height: 680px;
+  background: linear-gradient(160deg,#12062a,#0a0118);
+  border-radius: 44px;
+  border: 1.5px solid rgba(150,90,255,0.5);
+  box-shadow: 0 0 40px rgba(140,70,255,0.3), 0 0 80px rgba(255,90,210,0.1);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  animation: glow 4s ease-in-out infinite;
+}
+@keyframes glow {
+  0%,100% { box-shadow: 0 0 40px rgba(140,70,255,0.3), 0 0 80px rgba(255,90,210,0.1); }
+  50% { box-shadow: 0 0 55px rgba(140,70,255,0.45), 0 0 100px rgba(255,90,210,0.18); }
+}
+.notch {
+  width: 100px; height: 26px; background: #0a0118;
+  border-radius: 0 0 18px 18px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
+}
+.nc { width:8px;height:8px;background:#1a0a2e;border-radius:50%;border:1px solid rgba(150,90,255,0.3); }
+.ns { width:36px;height:4px;background:#1a0a2e;border-radius:2px; }
+.statusbar {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4px 20px;font-size:11px;color:rgba(220,200,255,0.7);flex-shrink:0;
+}
+
+/* SCREENS */
+.screen { display:none;flex-direction:column;flex:1;overflow:hidden; }
+.screen.active { display:flex; }
+.hdr {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 18px 6px;border-bottom:1px solid rgba(150,90,255,0.2);flex-shrink:0;
+}
+.hdr-t { font-size:15px;font-weight:800;color:#e8dcff; }
+.hdr-i {
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,122,224,0.1);border:1px solid rgba(255,122,224,0.3);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.tabs { display:flex;border-bottom:1px solid rgba(150,90,255,0.2);flex-shrink:0; }
+.tab {
+  flex:1;padding:8px;text-align:center;font-size:12px;cursor:pointer;
+  color:rgba(180,150,255,0.5);border-bottom:2px solid transparent;transition:all 0.2s;
+  background:none;border-top:none;border-left:none;border-right:none;outline:none;
+}
+.tab.active { color:#ff7ae0;border-bottom:2px solid #ff7ae0; }
+.scroll { flex:1;overflow-y:auto; }
+.scroll::-webkit-scrollbar { display:none; }
+
+/* TWEETS */
+.tweet { padding:12px 16px;border-bottom:1px solid rgba(150,90,255,0.12); }
+.tw-h { display:flex;align-items:center;gap:8px;margin-bottom:6px; }
+.ava {
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;border:1.5px solid rgba(150,90,255,0.4);flex-shrink:0;
+}
+.tw-name { font-size:13px;font-weight:700;color:#e8dcff; }
+.tw-handle { font-size:11px;color:rgba(180,150,255,0.5); }
+.tw-time { font-size:10px;color:rgba(180,150,255,0.4);margin-left:auto; }
+.tw-text { font-size:13px;color:#d0c0f0;line-height:1.5;margin-bottom:8px; }
+.tw-actions { display:flex;gap:16px; }
+.tw-btn {
+  display:flex;align-items:center;gap:4px;font-size:11px;
+  color:rgba(180,150,255,0.5);background:none;border:none;cursor:pointer;transition:color 0.2s;
+}
+.tw-btn:hover { color:#ff7ae0; }
+.tw-btn.liked { color:#ff5566; }
+.refresh-btn {
+  margin:10px 16px;padding:8px;
+  background:linear-gradient(135deg,rgba(120,48,255,0.2),rgba(255,90,210,0.2));
+  border:1px solid rgba(150,90,255,0.4);border-radius:10px;
+  color:#ff7ae0;font-size:12px;cursor:pointer;text-align:center;
+  width:calc(100% - 32px);transition:opacity 0.2s;
+}
+.refresh-btn:disabled { opacity:0.5;cursor:not-allowed; }
+
+/* TRENDS */
+.trend { padding:10px 16px;border-bottom:1px solid rgba(150,90,255,0.12); }
+.trend-l { font-size:10px;color:rgba(180,150,255,0.4); }
+.trend-t { font-size:14px;font-weight:700;color:#ff7ae0; }
+.trend-c { font-size:11px;color:rgba(180,150,255,0.5); }
+
+/* CHAT LIST */
+.chat-item {
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  cursor:pointer;border-bottom:1px solid rgba(150,90,255,0.08);transition:background 0.2s;
+}
+.chat-item:hover { background:rgba(150,90,255,0.1); }
+.ava-lg {
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;border:2px solid rgba(150,90,255,0.4);
+  flex-shrink:0;position:relative;
+}
+.online-dot {
+  width:10px;height:10px;background:#4caf50;border-radius:50%;
+  border:2px solid #12062a;position:absolute;bottom:0;right:0;
+}
+.ci-name { font-size:13px;font-weight:700;color:#e8dcff; }
+.ci-prev { font-size:11px;color:rgba(180,150,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.unread {
+  background:#ff7ae0;color:#12062a;font-size:10px;font-weight:800;
+  width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+
+/* CONVERSATION */
+.conv { display:none;flex-direction:column;height:100%; }
+.conv.open { display:flex; }
+.conv-hdr {
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-bottom:1px solid rgba(150,90,255,0.2);flex-shrink:0;
+}
+.back { color:#ff7ae0;font-size:22px;background:none;border:none;cursor:pointer;padding:0;line-height:1; }
+.conv-name { font-size:14px;font-weight:700;color:#e8dcff; }
+.conv-status { font-size:11px;color:#4caf50; }
+.messages {
+  flex:1;overflow-y:auto;padding:12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.messages::-webkit-scrollbar { display:none; }
+.msg { max-width:78%;padding:8px 12px;border-radius:16px;font-size:12px;line-height:1.5; }
+.msg.recv {
+  background:rgba(40,15,75,0.8);border:1px solid rgba(150,90,255,0.3);
+  color:#e8dcff;align-self:flex-start;border-bottom-left-radius:4px;
+}
+.msg.sent {
+  background:linear-gradient(135deg,#7a30ff,#ff5ad0);
+  color:#fff;align-self:flex-end;border-bottom-right-radius:4px;
+}
+.msg-t { font-size:9px;color:rgba(180,150,255,0.4);margin-top:2px; }
+.msg-t.r { align-self:flex-start; }
+.msg-t.s { align-self:flex-end; }
+.typing-bubble {
+  align-self:flex-start;padding:10px 14px;
+  background:rgba(40,15,75,0.8);border:1px solid rgba(150,90,255,0.3);
+  border-radius:16px;border-bottom-left-radius:4px;
+  display:flex;gap:4px;align-items:center;
+}
+.typing-bubble span {
+  width:6px;height:6px;background:rgba(150,90,255,0.6);border-radius:50%;
+  display:inline-block;animation:bounce 1.2s infinite ease-in-out;
+}
+.typing-bubble span:nth-child(2){animation-delay:0.2s;}
+.typing-bubble span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,80%,100%{transform:scale(0.6)}40%{transform:scale(1)}}
+.inp-area {
+  display:flex;gap:8px;padding:8px 12px;
+  border-top:1px solid rgba(150,90,255,0.2);flex-shrink:0;
+}
+.inp {
+  flex:1;background:rgba(40,15,75,0.5);border:1px solid rgba(150,90,255,0.3);
+  border-radius:20px;padding:8px 14px;color:#e8dcff;font-size:12px;outline:none;
+}
+.inp::placeholder { color:rgba(180,150,255,0.4); }
+.snd {
+  width:34px;height:34px;background:linear-gradient(135deg,#7a30ff,#ff5ad0);
+  border-radius:50%;border:none;cursor:pointer;font-size:14px;
+  flex-shrink:0;transition:opacity 0.2s;
+}
+.snd:disabled { opacity:0.5;cursor:not-allowed; }
+
+/* BOTTOM NAV */
+.bnav { display:flex;border-top:1px solid rgba(150,90,255,0.2);flex-shrink:0; }
+.nbtn {
+  flex:1;padding:10px;text-align:center;font-size:20px;cursor:pointer;
+  background:none;border:none;color:rgba(180,150,255,0.4);transition:color 0.2s;
+}
+.nbtn.active { color:#ff7ae0; }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div class="setup" id="setup">
+  <div class="setup-box">
+    <div class="setup-title">📱 Adam Weil · Phone</div>
+    <div class="setup-sub">Вставь свой API ключ от rout.my.<br>Найди его в личном кабинете → API Keys.<br>Ключ сохранится только в этом браузере.</div>
+    <input class="setup-input" id="api-key-input" type="password" placeholder="sk-..." />
+    <button class="setup-btn" onclick="saveKey()">Войти →</button>
+  </div>
+</div>
+
+<!-- PHONE -->
+<div class="phone" id="phone" style="display:none;">
+  <div class="notch"><div class="nc"></div><div class="ns"></div></div>
+  <div class="statusbar"><span id="clk">00:00</span><span>📶 🔋</span></div>
+
+  <!-- TWITTER SCREEN -->
+  <div id="s-twitter" class="screen active">
+    <div class="hdr">
+      <span style="font-size:20px;font-weight:900;color:#1da1f2;">𝕏</span>
+      <span class="hdr-t">Для вас</span>
+      <div class="hdr-i">🔔</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="twTab('foryou',this)">Для вас</button>
+      <button class="tab" onclick="twTab('following',this)">Подписки</button>
+      <button class="tab" onclick="twTab('trends',this)">Тренды</button>
+    </div>
+    <div class="scroll">
+      <div id="tab-foryou">
+        <button class="refresh-btn" id="btn-refresh" onclick="refreshFeed()">✨ Обновить ленту через AI</button>
+        <div id="feed"></div>
+      </div>
+      <div id="tab-following" style="display:none;">
+        <div style="padding:20px;color:rgba(180,150,255,0.5);font-size:13px;text-align:center;">Только подписки · скоро</div>
+      </div>
+      <div id="tab-trends" style="display:none;">
+        <div class="trend"><div class="trend-l">K-pop · Тренд</div><div class="trend-t">#StrayKids</div><div class="trend-c">284K твитов</div></div>
+        <div class="trend"><div class="trend-l">Музыка</div><div class="trend-t">#SKZComeback</div><div class="trend-c">156K твитов</div></div>
+        <div class="trend"><div class="trend-l">K-pop</div><div class="trend-t">#AdamWeil</div><div class="trend-c">89K твитов</div></div>
+        <div class="trend"><div class="trend-l">Развлечения</div><div class="trend-t">#MCountdown</div><div class="trend-c">61K твитов</div></div>
+        <div class="trend"><div class="trend-l">K-pop</div><div class="trend-t">#ChanRoom</div><div class="trend-c">43K твитов</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="s-chat" class="screen">
+    <div id="chat-list-view" style="display:flex;flex-direction:column;height:100%;">
+      <div class="hdr"><span class="hdr-t">💬 Сообщения</span><div class="hdr-i">✏️</div></div>
+      <div class="scroll">
+        <div class="chat-item" onclick="openConv('chan')">
+          <div class="ava-lg" style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);color:#7a9fff;">BC<div class="online-dot"></div></div>
+          <div style="flex:1;min-width:0;"><div class="ci-name">Bang Chan ✓</div><div class="ci-prev">в студии в 3 ночи...</div></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><span style="font-size:10px;color:rgba(180,150,255,0.4);">03:14</span><div class="unread">2</div></div>
+        </div>
+        <div class="chat-item" onclick="openConv('han')">
+          <div class="ava-lg" style="background:linear-gradient(135deg,#2e2a1a,#695f1b);color:#ffd97a;">HN</div>
+          <div style="flex:1;min-width:0;"><div class="ci-name">Han ✓</div><div class="ci-prev">слышал новый трек от Чана?</div></div>
+          <span style="font-size:10px;color:rgba(180,150,255,0.4);">вчера</span>
+        </div>
+        <div class="chat-item" onclick="openConv('hyunjin')">
+          <div class="ava-lg" style="background:linear-gradient(135deg,#1a2e1a,#1b6921);color:#7fff7a;">HJ</div>
+          <div style="flex:1;min-width:0;"><div class="ci-name">Hyunjin ✓</div><div class="ci-prev">пришли референс когда будешь готов</div></div>
+          <span style="font-size:10px;color:rgba(180,150,255,0.4);">вчера</span>
+        </div>
+        <div class="chat-item" onclick="openConv('felix')">
+          <div class="ava-lg" style="background:linear-gradient(135deg,#2e1a2e,#691b5f);color:#ff7ae0;">FL</div>
+          <div style="flex:1;min-width:0;"><div class="ci-name">Felix ✓</div><div class="ci-prev">hyung!! free tonight? 🍀</div></div>
+          <span style="font-size:10px;color:rgba(180,150,255,0.4);">вчера</span>
+        </div>
+        <div class="chat-item" onclick="openConv('manager')">
+          <div class="ava-lg" style="background:linear-gradient(135deg,#1a1a1a,#333);color:#aaa;">МГ</div>
+          <div style="flex:1;min-width:0;"><div class="ci-name">Менеджер</div><div class="ci-prev">расписание на завтра</div></div>
+          <span style="font-size:10px;color:rgba(180,150,255,0.4);">вчера</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversations -->
+    <div id="conv-chan" class="conv">
+      <div class="conv-hdr">
+        <button class="back" onclick="closeConv()">‹</button>
+        <div class="ava" style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);color:#7a9fff;width:34px;height:34px;font-size:11px;">BC</div>
+        <div><div class="conv-name">Bang Chan</div><div class="conv-status">● онлайн</div></div>
+      </div>
+      <div class="messages" id="m-chan">
+        <div class="msg recv">в студии в 3 ночи... кто-то ещё не спит? 😅</div><div class="msg-t r">03:12</div>
+        <div class="msg recv">воды хочешь? я у автомата стою</div><div class="msg-t r">03:13</div>
+      </div>
+      <div class="inp-area">
+        <input class="inp" id="i-chan" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')send('chan')">
+        <button class="snd" id="b-chan" onclick="send('chan')">➤</button>
+      </div>
+    </div>
+
+    <div id="conv-han" class="conv">
+      <div class="conv-hdr">
+        <button class="back" onclick="closeConv()">‹</button>
+        <div class="ava" style="background:linear-gradient(135deg,#2e2a1a,#695f1b);color:#ffd97a;width:34px;height:34px;font-size:11px;">HN</div>
+        <div><div class="conv-name">Han</div><div class="conv-status" style="color:rgba(180,150,255,0.5);">был недавно</div></div>
+      </div>
+      <div class="messages" id="m-han">
+        <div class="msg recv">слышал новый трек от Чана? он просто огонь 🔥</div><div class="msg-t r">вчера</div>
+        <div class="msg sent">ещё бы, я случайно услышал отрывок в коридоре</div><div class="msg-t s">вчера</div>
+        <div class="msg recv">😭 везёт же тебе</div><div class="msg-t r">вчера</div>
+      </div>
+      <div class="inp-area">
+        <input class="inp" id="i-han" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')send('han')">
+        <button class="snd" id="b-han" onclick="send('han')">➤</button>
+      </div>
+    </div>
+
+    <div id="conv-hyunjin" class="conv">
+      <div class="conv-hdr">
+        <button class="back" onclick="closeConv()">‹</button>
+        <div class="ava" style="background:linear-gradient(135deg,#1a2e1a,#1b6921);color:#7fff7a;width:34px;height:34px;font-size:11px;">HJ</div>
+        <div><div class="conv-name">Hyunjin</div><div class="conv-status" style="color:rgba(180,150,255,0.5);">был недавно</div></div>
+      </div>
+      <div class="messages" id="m-hyunjin">
+        <div class="msg recv">пришли референс когда будешь готов. хочу нарисовать арт для твоего релиза 🎨</div><div class="msg-t r">вчера</div>
+      </div>
+      <div class="inp-area">
+        <input class="inp" id="i-hyunjin" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')send('hyunjin')">
+        <button class="snd" id="b-hyunjin" onclick="send('hyunjin')">➤</button>
+      </div>
+    </div>
+
+    <div id="conv-felix" class="conv">
+      <div class="conv-hdr">
+        <button class="back" onclick="closeConv()">‹</button>
+        <div class="ava" style="background:linear-gradient(135deg,#2e1a2e,#691b5f);color:#ff7ae0;width:34px;height:34px;font-size:11px;">FL</div>
+        <div><div class="conv-name">Felix</div><div class="conv-status" style="color:rgba(180,150,255,0.5);">был недавно</div></div>
+      </div>
+      <div class="messages" id="m-felix">
+        <div class="msg recv">hyung!! free tonight? we're going for ramen 🍜🍀</div><div class="msg-t r">вчера</div>
+      </div>
+      <div class="inp-area">
+        <input class="inp" id="i-felix" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')send('felix')">
+        <button class="snd" id="b-felix" onclick="send('felix')">➤</button>
+      </div>
+    </div>
+
+    <div id="conv-manager" class="conv">
+      <div class="conv-hdr">
+        <button class="back" onclick="closeConv()">‹</button>
+        <div class="ava" style="background:linear-gradient(135deg,#1a1a1a,#333);color:#aaa;width:34px;height:34px;font-size:11px;">МГ</div>
+        <div><div class="conv-name">Менеджер</div><div class="conv-status" style="color:rgba(180,150,255,0.5);">был недавно</div></div>
+      </div>
+      <div class="messages" id="m-manager">
+        <div class="msg recv">расписание: 9:00 фотосессия, 14:00 запись, 19:00 репетиция. выспись</div><div class="msg-t r">вчера</div>
+        <div class="msg sent">ок</div><div class="msg-t s">вчера</div>
+      </div>
+      <div class="inp-area">
+        <input class="inp" id="i-manager" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')send('manager')">
+        <button class="snd" id="b-manager" onclick="send('manager')">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bnav">
+    <button class="nbtn active" onclick="showScreen('twitter',this)">🏠</button>
+    <button class="nbtn" onclick="showScreen('chat',this)">💬</button>
+    <button class="nbtn">🔍</button>
+    <button class="nbtn">🔔</button>
+    <button class="nbtn" style="font-size:11px;font-weight:800;">AW</button>
+  </div>
+</div>
+
+<script>
+// CONFIG — rout.my
+const API_BASE = "https://api.rout.my/v1";
+const MODEL = "google/gemini-2.0-flash-001";
+let API_KEY = "";
+
+// Chat histories
+const H = {
+  chan: {
+    sys: "Ты Bang Chan из Stray Kids — лидер, продюсер 3RACHA. Пишешь в личке Адаму Уэйлу — айдолу из другой группы, с которым недавно познакомился ночью в JYP. Тепло, коротко 1-2 предложения. Иногда английские слова.",
+    h: [{role:"assistant",content:"в студии в 3 ночи... кто-то ещё не спит? 😅"},{role:"assistant",content:"воды хочешь? я у автомата стою"}]
+  },
+  han: {
+    sys: "Ты Han Jisung из Stray Kids — рэпер, эмоциональный. Пишешь Адаму Уэйлу в личке. Коротко, 1-2 предложения.",
+    h: [{role:"assistant",content:"слышал новый трек от Чана? огонь 🔥"},{role:"user",content:"ещё бы, я случайно услышал отрывок"},{role:"assistant",content:"😭 везёт же тебе"}]
+  },
+  hyunjin: {
+    sys: "Ты Hyunjin из Stray Kids — художник, поэтичный. Пишешь Адаму в личке. 1-2 предложения.",
+    h: [{role:"assistant",content:"пришли референс когда будешь готов. хочу нарисовать арт для твоего релиза 🎨"}]
+  },
+  felix: {
+    sys: "Ты Felix из Stray Kids — австралиец, очень добрый. Пишешь Адаму. Мешай английский и корейский. 1-2 предложения.",
+    h: [{role:"assistant",content:"hyung!! free tonight? we're going for ramen 🍜🍀"}]
+  },
+  manager: {
+    sys: "Ты строгий менеджер айдола Адама Уэйла. Только по делу, сухо. 1 предложение.",
+    h: [{role:"assistant",content:"расписание: 9:00 фотосессия, 14:00 запись, 19:00 репетиция"},{role:"user",content:"ок"}]
+  }
+};
+
+// Static feed
+const SEED = [
+  {id:1,init:"BC",grad:"linear-gradient(135deg,#1a1a2e,#2d1b69)",col:"#7a9fff",name:"Bang Chan ✓",handle:"@realstraykids",time:"2ч",text:"в студии в 3 ночи... кто-то ещё не спит? 🎧 #3RACHA",lk:"2.4k",cm:"847",rt:"1.2k",liked:false},
+  {id:2,init:"HN",grad:"linear-gradient(135deg,#2e2a1a,#695f1b)",col:"#ffd97a",name:"Han ✓",handle:"@han_jisung",time:"5ч",text:"почему вдохновение приходит когда надо спать 😤 пятый трек за ночь",lk:"9.4k",cm:"1.3k",rt:"2.1k",liked:false},
+  {id:3,init:"AW",grad:"linear-gradient(135deg,#0a0118,#3d0d6b)",col:"#c084ff",name:"Adam Weil ✓",handle:"@adamweil_off",time:"12ч",text:". #comeback",lk:"45.2k",cm:"8.9k",rt:"12.1k",liked:true},
+  {id:4,init:"FL",grad:"linear-gradient(135deg,#2e1a2e,#691b5f)",col:"#ff7ae0",name:"Felix ✓",handle:"@felix_skz",time:"6ч",text:"good morning stays!! 🍀 have the best day ever 🥺 #Felix",lk:"31.7k",cm:"5.8k",rt:"8.2k",liked:false},
+];
+let feed = [...SEED];
+
+// SETUP
+function saveKey(){
+  const k = document.getElementById('api-key-input').value.trim();
+  if(!k){alert('Вставь API ключ!');return;}
+  API_KEY = k;
+  localStorage.setItem('routmy_key', k);
+  document.getElementById('setup').style.display='none';
+  document.getElementById('phone').style.display='flex';
+  renderFeed();
+}
+window.onload = () => {
+  const saved = localStorage.getItem('routmy_key');
+  if(saved){ API_KEY=saved; document.getElementById('setup').style.display='none'; document.getElementById('phone').style.display='flex'; renderFeed(); }
+  updateClock();
+  setInterval(updateClock, 1000);
+};
+
+// CLOCK
+function updateClock(){const n=new Date();document.getElementById('clk').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function ts(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+
+// SCREENS
+function showScreen(name,btn){
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('s-twitter').classList.toggle('active',name==='twitter');
+  document.getElementById('s-chat').classList.toggle('active',name==='chat');
+  if(name==='chat'){
+    document.getElementById('chat-list-view').style.display='flex';
+    document.querySelectorAll('.conv').forEach(c=>c.classList.remove('open'));
+  }
+}
+
+// TWITTER TABS
+function twTab(id,el){
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['foryou','following','trends'].forEach(t=>document.getElementById('tab-'+t).style.display=t===id?'block':'none');
+}
+
+// RENDER FEED
+function renderFeed(){
+  const f=document.getElementById('feed');
+  f.innerHTML='';
+  feed.forEach(tw=>{
+    const text=(tw.text||'').replace(/#(\S+)/g,'<span style="color:#ff7ae0">#$1</span>').replace(/@(\S+)/g,'<span style="color:#9ac0ff">@$1</span>');
+    const div=document.createElement('div');
+    div.className='tweet';
+    div.innerHTML=`<div class="tw-h"><div class="ava" style="background:${tw.grad};color:${tw.col};">${tw.init}</div><div><div class="tw-name">${tw.name}</div><div class="tw-handle">${tw.handle}</div></div><div class="tw-time">${tw.time}</div></div><div class="tw-text">${text}</div><div class="tw-actions"><button class="tw-btn${tw.liked?' liked':''}" onclick="toggleLike(${tw.id})">${tw.liked?'❤️':'🤍'} ${tw.lk}</button><button class="tw-btn">💬 ${tw.cm}</button><button class="tw-btn">🔁 ${tw.rt}</button></div>`;
+    f.appendChild(div);
+  });
+}
+
+function toggleLike(id){
+  feed=feed.map(t=>t.id===id?{...t,liked:!t.liked}:t);
+  renderFeed();
+}
+
+// REFRESH FEED
+async function refreshFeed(){
+  const btn=document.getElementById('btn-refresh');
+  btn.disabled=true; btn.textContent='⏳ Генерирую...';
+  try{
+    const res=await fetch(API_BASE+'/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body:JSON.stringify({
+        model:MODEL, max_tokens:600,
+        messages:[
+          {role:'system',content:'Ты генерируешь k-pop Twitter ленту. Отвечай ТОЛЬКО валидным JSON массивом без markdown и пояснений.'},
+          {role:'user',content:'Создай 3 коротких твита от участников Stray Kids. JSON массив: [{"init":"XX","grad":"linear-gradient(135deg,#hex1,#hex2)","col":"#hex","name":"Имя ✓","handle":"@handle","time":"Nч","text":"текст до 80 символов с хэштегами","lk":"Xk","cm":"Xk","rt":"Xk"}]. Контекст: Bang Chan недавно познакомился ночью с айдолом Adam Weil в коридоре JYP.'}
+        ]
+      })
+    });
+    const data=await res.json();
+    const raw=(data.choices?.[0]?.message?.content||'[]').replace(/```json|```/g,'').trim();
+    const tweets=JSON.parse(raw);
+    feed=[...tweets.map((t,i)=>({...t,id:Date.now()+i,liked:false})),...feed];
+    renderFeed();
+  }catch(e){console.error(e);}
+  btn.disabled=false; btn.textContent='✨ Обновить ленту через AI';
+}
+
+// CHAT
+function openConv(id){
+  document.getElementById('chat-list-view').style.display='none';
+  document.getElementById('conv-'+id).classList.add('open');
+}
+function closeConv(){
+  document.querySelectorAll('.conv').forEach(c=>c.classList.remove('open'));
+  document.getElementById('chat-list-view').style.display='flex';
+}
+
+function addMsg(containerId,text,type){
+  const c=document.getElementById(containerId);
+  const m=document.createElement('div');
+  m.className='msg '+type; m.textContent=text;
+  const t=document.createElement('div');
+  t.className='msg-t '+(type==='recv'?'r':'s'); t.textContent=ts();
+  c.appendChild(m); c.appendChild(t);
+  c.scrollTop=c.scrollHeight;
+}
+
+async function send(id){
+  const inp=document.getElementById('i-'+id);
+  const btn=document.getElementById('b-'+id);
+  const text=inp.value.trim();
+  if(!text||btn.disabled)return;
+  inp.value=''; btn.disabled=true;
+  addMsg('m-'+id,text,'sent');
+  H[id].h.push({role:'user',content:text});
+  // Typing indicator
+  const c=document.getElementById('m-'+id);
+  const typing=document.createElement('div');
+  typing.className='typing-bubble';
+  typing.innerHTML='<span></span><span></span><span></span>';
+  c.appendChild(typing); c.scrollTop=c.scrollHeight;
+  try{
+    const res=await fetch(API_BASE+'/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},
+      body:JSON.stringify({
+        model:MODEL, max_tokens:150,
+        messages:[{role:'system',content:H[id].sys},...H[id].h]
+      })
+    });
+    const data=await res.json();
+    const reply=data.choices?.[0]?.message?.content||'...';
+    c.removeChild(typing);
+    H[id].h.push({role:'assistant',content:reply});
+    addMsg('m-'+id,reply,'recv');
+  }catch(e){
+    c.removeChild(typing);
+    addMsg('m-'+id,'(нет соединения)','recv');
+  }
+  btn.disabled=false;
+}
+</script>
+</body>
+</html>
